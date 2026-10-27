@@ -2,344 +2,501 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>TuanTu Store</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --red:    #ff1a1a;
-    --red2:   #cc0000;
-    --dark:   #0a0a0a;
-    --dark2:  #111111;
-    --dark3:  #1a0000;
-    --border: #330000;
-    --text:   #e0e0e0;
-    --glow:   0 0 12px rgba(255,26,26,0.7);
-  }
+:root{
+  --r:#ff1a1a;--r2:#cc0000;--r3:#ff4444;
+  --bg:#050508;--bg2:#0d0d12;--bg3:#12121a;
+  --border:rgba(255,26,26,0.25);
+  --glow:0 0 20px rgba(255,26,26,0.6);
+  --glow2:0 0 40px rgba(255,26,26,0.3);
+  --text:#e8e8f0;--text2:#888899;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{overflow-x:hidden;background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh}
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+/* BG ANIMATED */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,26,26,0.15),transparent),
+    radial-gradient(ellipse 40% 40% at 100% 100%,rgba(255,26,26,0.05),transparent);
+  pointer-events:none;z-index:0;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(255,26,26,0.015) 60px,rgba(255,26,26,0.015) 61px),
+    repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(255,26,26,0.015) 60px,rgba(255,26,26,0.015) 61px);
+  pointer-events:none;z-index:0;
+}
 
-  body {
-    background: var(--dark);
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse at top, #1a0000 0%, transparent 60%),
-      repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255,26,26,0.02) 40px, rgba(255,26,26,0.02) 41px),
-      repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,26,26,0.02) 40px, rgba(255,26,26,0.02) 41px);
-  }
+/* SIDEBAR */
+.sidebar-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(4px);z-index:100;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.sidebar-overlay.open{opacity:1;pointer-events:all}
 
-  /* HEADER */
-  header {
-    text-align: center;
-    padding: 40px 20px 20px;
-    position: relative;
-  }
-  header::after {
-    content: '';
-    display: block;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--red), transparent);
-    margin-top: 20px;
-  }
-  .logo {
-    font-family: 'Orbitron', monospace;
-    font-size: clamp(28px, 6vw, 52px);
-    font-weight: 900;
-    color: var(--red);
-    text-shadow: var(--glow), 0 0 40px rgba(255,26,26,0.4);
-    letter-spacing: 4px;
-  }
-  .logo span { color: #fff; }
-  .subtitle {
-    font-size: 14px;
-    color: #666;
-    letter-spacing: 6px;
-    margin-top: 6px;
-    text-transform: uppercase;
-  }
+.sidebar{
+  position:fixed;left:0;top:0;height:100%;width:280px;
+  background:linear-gradient(180deg,#0d0005 0%,#0a0010 50%,#050008 100%);
+  border-right:1px solid var(--border);
+  z-index:101;transform:translateX(-100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+}
+.sidebar.open{transform:translateX(0)}
 
-  /* FILTER BAR */
-  .filter-bar {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 20px;
-  }
-  .filter-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: #888;
-    padding: 6px 18px;
-    border-radius: 2px;
-    cursor: pointer;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    transition: all 0.2s;
-  }
-  .filter-btn:hover,
-  .filter-btn.active {
-    border-color: var(--red);
-    color: var(--red);
-    box-shadow: var(--glow);
-  }
+.sidebar-top{
+  padding:40px 24px 24px;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(255,26,26,0.08),transparent);
+}
+.sidebar-avatar{
+  width:64px;height:64px;border-radius:50%;
+  background:linear-gradient(135deg,var(--r2),#330000);
+  border:2px solid var(--r);
+  box-shadow:var(--glow);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron',monospace;font-size:22px;color:var(--r);
+  margin-bottom:14px;font-weight:900;
+}
+.sidebar-name{
+  font-family:'Orbitron',monospace;font-size:14px;
+  color:#fff;letter-spacing:2px;margin-bottom:6px;
+}
+.sidebar-badge{
+  display:inline-block;padding:2px 10px;
+  background:linear-gradient(90deg,var(--r2),var(--r));
+  border-radius:20px;font-size:10px;letter-spacing:3px;color:#fff;
+  font-weight:700;margin-bottom:10px;
+}
+.sidebar-ip{
+  font-size:12px;color:var(--text2);letter-spacing:1px;
+}
+.sidebar-ip span{color:var(--r3);font-family:monospace}
 
-  /* SEARCH */
-  .search-wrap {
-    display: flex;
-    justify-content: center;
-    padding: 0 20px 24px;
-  }
-  .search-wrap input {
-    background: var(--dark2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 10px 20px;
-    width: 100%;
-    max-width: 420px;
-    border-radius: 2px;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .search-wrap input:focus { border-color: var(--red); }
+.sidebar-menu{padding:20px 0;flex:1}
+.sidebar-item{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 24px;color:var(--text2);
+  font-size:14px;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;transition:all .2s;border-left:3px solid transparent;
+}
+.sidebar-item:hover,.sidebar-item.active{
+  color:var(--r);border-left-color:var(--r);
+  background:rgba(255,26,26,0.05);
+}
+.sidebar-item i{font-size:18px;width:20px;text-align:center}
 
-  /* GRID */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    padding: 0 20px 60px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
+.sidebar-footer{
+  padding:20px 24px;border-top:1px solid var(--border);
+  font-size:11px;color:#333;letter-spacing:2px;text-align:center;
+}
 
-  /* CARD */
-  .card {
-    background: var(--dark2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-    position: relative;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 32px rgba(255,26,26,0.25);
-    border-color: var(--red2);
-  }
-  .card-img-wrap {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16/9;
-    overflow: hidden;
-    background: #0d0d0d;
-  }
-  .card-img-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s;
-  }
-  .card:hover .card-img-wrap img { transform: scale(1.05); }
+/* SWIPE HINT */
+.swipe-hint{
+  position:fixed;left:0;top:50%;transform:translateY(-50%);
+  width:4px;height:60px;background:linear-gradient(180deg,transparent,var(--r),transparent);
+  border-radius:0 4px 4px 0;z-index:50;opacity:.6;
+  animation:pulseHint 2s infinite;
+}
+@keyframes pulseHint{0%,100%{opacity:.3}50%{opacity:.8}}
 
-  .tag {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 3px 10px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    border-radius: 2px;
-  }
-  .tag-FREE { background: #003300; color: #00ff88; border: 1px solid #00ff88; }
-  .tag-VIP  { background: #1a0000; color: var(--red); border: 1px solid var(--red); }
+/* TOP NAV */
+.topnav{
+  position:sticky;top:0;z-index:90;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;
+  background:rgba(5,5,8,0.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.nav-menu-btn{
+  width:36px;height:36px;display:flex;flex-direction:column;
+  justify-content:center;gap:5px;cursor:pointer;padding:4px;
+}
+.nav-menu-btn span{
+  display:block;height:2px;border-radius:2px;
+  background:var(--r);transition:all .3s;
+}
+.nav-menu-btn span:nth-child(2){width:70%}
+.nav-logo{
+  font-family:'Orbitron',monospace;font-size:16px;
+  font-weight:900;color:var(--r);letter-spacing:3px;
+  text-shadow:var(--glow);
+}
+.nav-logo span{color:#fff}
+.nav-right{width:36px}
 
-  .card-body { padding: 16px; }
-  .card-game {
-    font-size: 11px;
-    color: var(--red);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-  .card-title {
-    font-family: 'Orbitron', monospace;
-    font-size: 15px;
-    color: #fff;
-    margin-bottom: 8px;
-  }
-  .card-desc {
-    font-size: 13px;
-    color: #777;
-    margin-bottom: 16px;
-    line-height: 1.5;
-  }
-  .btn-download {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background: linear-gradient(135deg, var(--red2), var(--red));
-    color: #fff;
-    text-align: center;
-    text-decoration: none;
-    font-family: 'Orbitron', monospace;
-    font-size: 12px;
-    letter-spacing: 3px;
-    border-radius: 2px;
-    border: none;
-    cursor: pointer;
-    transition: opacity 0.2s, box-shadow 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-download::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(255,255,255,0.08);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s;
-  }
-  .btn-download:hover::before { transform: scaleX(1); }
-  .btn-download:hover { box-shadow: var(--glow); }
+/* HERO */
+.hero{
+  text-align:center;padding:50px 20px 30px;
+  position:relative;z-index:1;
+}
+.hero-tag{
+  display:inline-block;padding:4px 16px;
+  border:1px solid rgba(255,26,26,0.4);
+  border-radius:20px;font-size:11px;letter-spacing:4px;
+  color:var(--r3);text-transform:uppercase;margin-bottom:20px;
+  background:rgba(255,26,26,0.05);
+}
+.hero-title{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(32px,8vw,64px);
+  font-weight:900;line-height:1;
+  color:#fff;margin-bottom:8px;
+}
+.hero-title .accent{
+  color:var(--r);
+  text-shadow:var(--glow),0 0 60px rgba(255,26,26,0.5);
+}
+.hero-sub{
+  font-size:13px;color:var(--text2);letter-spacing:5px;
+  text-transform:uppercase;margin-bottom:30px;
+}
+.hero-line{
+  width:120px;height:1px;margin:0 auto;
+  background:linear-gradient(90deg,transparent,var(--r),transparent);
+}
 
-  /* COUNTER */
-  .counter {
-    text-align: center;
-    padding: 0 20px 16px;
-    color: #444;
-    font-size: 13px;
-    letter-spacing: 2px;
-  }
+/* STATS BAR */
+.stats-bar{
+  display:flex;justify-content:center;gap:0;
+  margin:0 20px 30px;border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;background:var(--bg2);
+  position:relative;z-index:1;max-width:500px;margin-left:auto;margin-right:auto;
+}
+.stat-item{
+  flex:1;padding:14px 10px;text-align:center;
+  border-right:1px solid var(--border);
+}
+.stat-item:last-child{border-right:none}
+.stat-num{
+  font-family:'Orbitron',monospace;font-size:20px;
+  color:var(--r);font-weight:700;
+}
+.stat-label{font-size:10px;color:var(--text2);letter-spacing:2px;margin-top:2px}
 
-  /* FOOTER */
-  footer {
-    text-align: center;
-    padding: 20px;
-    border-top: 1px solid var(--border);
-    color: #333;
-    font-size: 12px;
-    letter-spacing: 3px;
-  }
+/* SEARCH */
+.search-section{
+  padding:0 20px 24px;max-width:560px;
+  margin:0 auto;position:relative;z-index:1;
+}
+.search-box{
+  position:relative;display:flex;align-items:center;
+}
+.search-box input{
+  width:100%;background:var(--bg2);
+  border:1px solid var(--border);
+  color:var(--text);padding:12px 20px 12px 46px;
+  border-radius:6px;font-family:'Rajdhani',sans-serif;
+  font-size:15px;outline:none;
+  transition:border-color .2s,box-shadow .2s;letter-spacing:1px;
+}
+.search-box input:focus{
+  border-color:var(--r);
+  box-shadow:0 0 0 3px rgba(255,26,26,0.1);
+}
+.search-icon{
+  position:absolute;left:16px;color:var(--text2);font-size:16px;
+}
 
-  /* SKELETON loading */
-  .skeleton {
-    background: linear-gradient(90deg, #1a0000 25%, #220000 50%, #1a0000 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.2s infinite;
-    border-radius: 4px;
-  }
-  @keyframes shimmer {
-    0%   { background-position: -200% 0; }
-    100% { background-position:  200% 0; }
-  }
+/* GRID */
+.grid-section{padding:0 16px 80px;max-width:1200px;margin:0 auto;position:relative;z-index:1}
+.grid-label{
+  font-size:11px;color:var(--text2);letter-spacing:4px;
+  text-transform:uppercase;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.grid-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:16px;
+}
+
+/* CARD */
+.card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+  position:relative;cursor:pointer;
+  transition:transform .25s,box-shadow .25s,border-color .25s;
+}
+.card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,26,26,0.03),transparent 60%);
+  pointer-events:none;
+}
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 16px 48px rgba(255,26,26,0.2),0 0 0 1px rgba(255,26,26,0.3);
+  border-color:rgba(255,26,26,0.5);
+}
+
+.card-img{
+  position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;
+  background:linear-gradient(135deg,#0d0005,#050010);
+}
+.card-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.card:hover .card-img img{transform:scale(1.08)}
+.card-img-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 40%,rgba(5,5,8,0.9));
+}
+
+.card-badge{
+  position:absolute;top:12px;left:12px;
+  padding:4px 12px;border-radius:20px;
+  font-size:10px;font-weight:700;letter-spacing:3px;
+}
+.badge-FREE{background:rgba(0,255,100,0.15);color:#00ff88;border:1px solid rgba(0,255,100,0.4)}
+.badge-VIP{background:rgba(255,26,26,0.15);color:var(--r);border:1px solid rgba(255,26,26,0.4)}
+
+.card-body{padding:16px 18px 18px}
+.card-cat{
+  font-size:10px;color:var(--r);letter-spacing:4px;
+  text-transform:uppercase;margin-bottom:6px;
+}
+.card-title{
+  font-family:'Orbitron',monospace;font-size:14px;
+  color:#fff;margin-bottom:8px;line-height:1.3;
+}
+.card-desc{
+  font-size:13px;color:var(--text2);
+  margin-bottom:16px;line-height:1.6;
+}
+.card-footer{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.btn-dl{
+  flex:1;padding:10px 16px;
+  background:linear-gradient(135deg,var(--r2),var(--r));
+  color:#fff;text-align:center;text-decoration:none;
+  font-family:'Orbitron',monospace;font-size:11px;letter-spacing:2px;
+  border-radius:6px;border:none;cursor:pointer;
+  transition:box-shadow .2s,transform .2s;display:block;
+  position:relative;overflow:hidden;
+}
+.btn-dl::after{
+  content:'';position:absolute;top:-50%;left:-60%;
+  width:40%;height:200%;
+  background:rgba(255,255,255,0.15);
+  transform:skewX(-20deg);
+  transition:left .4s;
+}
+.btn-dl:hover::after{left:120%}
+.btn-dl:hover{box-shadow:var(--glow);transform:translateY(-1px)}
+
+.card-views{
+  font-size:11px;color:var(--text2);letter-spacing:1px;
+  white-space:nowrap;
+}
+
+/* EMPTY */
+.empty{
+  grid-column:1/-1;text-align:center;padding:80px 20px;
+  color:var(--text2);
+}
+.empty-icon{font-size:48px;margin-bottom:16px;opacity:.3}
+.empty p{letter-spacing:3px;font-size:13px}
+
+/* SKELETON */
+.skeleton{
+  background:linear-gradient(90deg,#0d0010 25%,#150018 50%,#0d0010 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.4s infinite;border-radius:4px;
+}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--r2);border-radius:4px}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">TUANTU <span>STORE</span></div>
-  <div class="subtitle">Hack Tools Distribution</div>
-</header>
+<div class="swipe-hint"></div>
 
-<div class="filter-bar" id="filterBar">
-  <button class="filter-btn active" data-filter="ALL">ALL</button>
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-avatar">V</div>
+    <div class="sidebar-name" id="sbName">VIP USER</div>
+    <div class="sidebar-badge">✦ VIP MEMBER</div>
+    <div class="sidebar-ip">IP: <span id="sbIp">loading...</span></div>
+  </div>
+  <div class="sidebar-menu">
+    <div class="sidebar-item active">
+      <span>⚡</span> Trang chủ
+    </div>
+    <div class="sidebar-item">
+      <span>🎮</span> Free Fire
+    </div>
+    <div class="sidebar-item">
+      <span>🔥</span> Tool mới nhất
+    </div>
+    <div class="sidebar-item">
+      <span>💎</span> VIP Tools
+    </div>
+    <div class="sidebar-item">
+      <span>📢</span> Telegram
+    </div>
+  </div>
+  <div class="sidebar-footer">TUANTU STORE © 2026</div>
 </div>
 
-<div class="search-wrap">
-  <input type="text" id="searchInput" placeholder="🔍  Tìm kiếm tool..."/>
+<!-- TOP NAV -->
+<div class="topnav">
+  <div class="nav-menu-btn" id="menuBtn" onclick="openSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="nav-logo">TUANTU <span>STORE</span></div>
+  <div class="nav-right"></div>
 </div>
 
-<div class="counter" id="counter">Loading...</div>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">⚡ FREE FIRE TOOLS</div>
+  <div class="hero-title">
+    <span class="accent">TUAN</span>TU<br/>STORE
+  </div>
+  <div class="hero-sub">Hack Tools Distribution</div>
+  <div class="hero-line"></div>
+</div>
 
-<div class="grid" id="grid"></div>
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-num" id="totalTools">0</div>
+    <div class="stat-label">TOOLS</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="freeCount">0</div>
+    <div class="stat-label">FREE</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="vipCount">0</div>
+    <div class="stat-label">VIP</div>
+  </div>
+</div>
 
-<footer>© 2026 TUANTU STORE — ALL RIGHTS RESERVED</footer>
+<!-- SEARCH -->
+<div class="search-section">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Tìm kiếm tool..."/>
+  </div>
+</div>
+
+<!-- GRID -->
+<div class="grid-section">
+  <div class="grid-label">ALL TOOLS</div>
+  <div class="grid" id="grid"></div>
+</div>
 
 <script>
-const DATA_URL = 'data.json';
+// ── SIDEBAR SWIPE ──
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX }, {passive:true});
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (touchStartX < 40 && dx > 60) openSidebar();
+  if (dx < -60 && document.getElementById('sidebar').classList.contains('open')) closeSidebar();
+}, {passive:true});
+
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+// ── GET IP ──
+fetch('https://api.ipify.org?format=json')
+  .then(r => r.json())
+  .then(d => { document.getElementById('sbIp').textContent = d.ip; })
+  .catch(() => { document.getElementById('sbIp').textContent = 'N/A'; });
+
+// ── LOAD DATA ──
 let allItems = [];
-let activeFilter = 'ALL';
 
 async function loadData() {
-  const grid = document.getElementById('grid');
-
-  // skeleton
-  grid.innerHTML = Array(6).fill(`
-    <div class="card">
-      <div class="skeleton" style="width:100%;aspect-ratio:16/9"></div>
-      <div class="card-body">
-        <div class="skeleton" style="height:12px;width:60%;margin-bottom:8px"></div>
-        <div class="skeleton" style="height:18px;width:80%;margin-bottom:8px"></div>
-        <div class="skeleton" style="height:12px;width:100%;margin-bottom:16px"></div>
-        <div class="skeleton" style="height:36px;width:100%"></div>
-      </div>
-    </div>
-  `).join('');
-
+  showSkeleton();
   try {
-    const r = await fetch(DATA_URL + '?t=' + Date.now());
+    const r = await fetch('data.json?t=' + Date.now());
     allItems = await r.json();
-    buildFilters();
+    updateStats();
     render();
   } catch(e) {
-    grid.innerHTML = '<p style="color:#ff1a1a;text-align:center;padding:40px">Lỗi load data.json</p>';
+    document.getElementById('grid').innerHTML =
+      '<div class="empty"><div class="empty-icon">⚠</div><p>LỖI LOAD DATA.JSON</p></div>';
   }
 }
 
-function buildFilters() {
-  const games = ['ALL', ...new Set(allItems.map(i => i.game))];
-  const bar = document.getElementById('filterBar');
-  bar.innerHTML = games.map(g =>
-    `<button class="filter-btn ${g==='ALL'?'active':''}" data-filter="${g}">${g}</button>`
-  ).join('');
-  bar.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      bar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeFilter = btn.dataset.filter;
-      render();
-    });
-  });
+function showSkeleton() {
+  document.getElementById('grid').innerHTML = Array(4).fill(`
+    <div class="card">
+      <div class="skeleton" style="width:100%;aspect-ratio:16/9"></div>
+      <div class="card-body">
+        <div class="skeleton" style="height:10px;width:50%;margin-bottom:8px"></div>
+        <div class="skeleton" style="height:16px;width:75%;margin-bottom:10px"></div>
+        <div class="skeleton" style="height:12px;width:100%;margin-bottom:16px"></div>
+        <div class="skeleton" style="height:38px;width:100%"></div>
+      </div>
+    </div>`).join('');
+}
+
+function updateStats() {
+  document.getElementById('totalTools').textContent = allItems.length;
+  document.getElementById('freeCount').textContent  = allItems.filter(i=>i.tag==='FREE').length;
+  document.getElementById('vipCount').textContent   = allItems.filter(i=>i.tag==='VIP').length;
 }
 
 function render() {
   const q = document.getElementById('searchInput').value.toLowerCase();
-  const filtered = allItems.filter(item => {
-    const matchFilter = activeFilter === 'ALL' || item.game === activeFilter;
-    const matchSearch = !q || item.title.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
-    return matchFilter && matchSearch;
-  });
+  const filtered = allItems.filter(i =>
+    !q || i.title.toLowerCase().includes(q) || (i.description||'').toLowerCase().includes(q)
+  );
 
-  document.getElementById('counter').textContent = `${filtered.length} TOOLS AVAILABLE`;
+  if (!filtered.length) {
+    document.getElementById('grid').innerHTML =
+      '<div class="empty"><div class="empty-icon">🔍</div><p>KHÔNG TÌM THẤY TOOL NÀO</p></div>';
+    return;
+  }
 
-  document.getElementById('grid').innerHTML = filtered.length === 0
-    ? '<p style="color:#444;text-align:center;padding:60px;grid-column:1/-1">Không tìm thấy tool nào.</p>'
-    : filtered.map(item => `
-      <div class="card">
-        <div class="card-img-wrap">
-          <img src="${item.image}" alt="${item.title}" loading="lazy"
-               onerror="this.src='https://via.placeholder.com/480x270/1a0000/ff1a1a?text=NO+IMAGE'"/>
-          <span class="tag tag-${item.tag}">${item.tag}</span>
-        </div>
-        <div class="card-body">
-          <div class="card-game">${item.game}</div>
-          <div class="card-title">${item.title}</div>
-          <div class="card-desc">${item.description}</div>
-          <a class="btn-download" href="${item.download}" target="_blank" rel="noopener">
-            ▼ DOWNLOAD
+  document.getElementById('grid').innerHTML = filtered.map(item => `
+    <div class="card">
+      <div class="card-img">
+        <img src="${item.image||''}" alt="${item.title}" loading="lazy"
+             onerror="this.parentElement.style.background='linear-gradient(135deg,#1a0005,#05001a)';this.style.display='none'"/>
+        <div class="card-img-overlay"></div>
+        <span class="card-badge badge-${item.tag}">${item.tag}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-cat">FREE FIRE</div>
+        <div class="card-title">${item.title}</div>
+        <div class="card-desc">${item.description||''}</div>
+        <div class="card-footer">
+          <a class="btn-dl" href="${item.download}" target="_blank" rel="noopener">
+            ▼ TẢI XUỐNG
           </a>
+          <span class="card-views">⚡ FREE</span>
         </div>
       </div>
-    `).join('');
+    </div>`).join('');
 }
 
 document.getElementById('searchInput').addEventListener('input', render);
