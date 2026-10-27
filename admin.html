@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin — TuanTu Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Orbitron:wght@700&display=swap" rel="stylesheet"/>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0a0a0a; color:#e0e0e0; font-family:'Rajdhani',sans-serif; padding:24px; }
+  h1 { font-family:'Orbitron',monospace; color:#ff1a1a; margin-bottom:24px; letter-spacing:3px; }
+  .card { background:#111; border:1px solid #330000; border-radius:4px; padding:16px; margin-bottom:12px; position:relative; }
+  .card h3 { color:#fff; font-family:'Orbitron',monospace; font-size:13px; margin-bottom:6px; }
+  .card p { color:#666; font-size:13px; }
+  .btn { padding:8px 16px; border:none; border-radius:2px; cursor:pointer; font-family:'Orbitron',monospace; font-size:11px; letter-spacing:2px; }
+  .btn-red { background:#cc0000; color:#fff; }
+  .btn-green { background:#003300; color:#00ff88; border:1px solid #00ff88; }
+  .btn-blue { background:#001133; color:#00aaff; border:1px solid #00aaff; }
+  .actions { position:absolute; top:16px; right:16px; display:flex; gap:8px; }
+  .form-wrap { background:#111; border:1px solid #ff1a1a; border-radius:4px; padding:20px; margin-bottom:24px; }
+  .form-wrap h2 { color:#ff1a1a; font-family:'Orbitron',monospace; font-size:13px; margin-bottom:16px; letter-spacing:2px; }
+  label { display:block; color:#888; font-size:12px; letter-spacing:2px; margin-bottom:4px; margin-top:12px; }
+  input, select, textarea {
+    width:100%; background:#0a0a0a; border:1px solid #330000; color:#e0e0e0;
+    padding:8px 12px; border-radius:2px; font-family:'Rajdhani',sans-serif; font-size:14px; outline:none;
+  }
+  input:focus, select:focus, textarea:focus { border-color:#ff1a1a; }
+  .json-out { margin-top:24px; }
+  .json-out h2 { color:#ff1a1a; font-family:'Orbitron',monospace; font-size:12px; margin-bottom:8px; letter-spacing:2px; }
+  #jsonBox { width:100%; height:200px; background:#050505; border:1px solid #330000; color:#00ff88; font-family:monospace; font-size:12px; padding:12px; border-radius:2px; resize:vertical; }
+  .copy-btn { margin-top:8px; }
+  .tag-free { color:#00ff88; }
+  .tag-vip  { color:#ff1a1a; }
+  .topbar { display:flex; gap:12px; margin-bottom:20px; align-items:center; flex-wrap:wrap; }
+  .count { color:#444; font-size:13px; letter-spacing:2px; }
+</style>
+</head>
+<body>
+
+<h1>⚡ ADMIN PANEL</h1>
+<p style="color:#444;font-size:13px;margin-bottom:24px;letter-spacing:2px">
+  Thêm/sửa/xóa tool → copy JSON → paste vào data.json → push GitHub → Vercel tự deploy
+</p>
+
+<!-- FORM THÊM -->
+<div class="form-wrap">
+  <h2 id="formTitle">+ THÊM TOOL MỚI</h2>
+  <input type="hidden" id="editId"/>
+  <label>TIÊU ĐỀ</label>
+  <input id="fTitle" placeholder="FF ESP V1.0"/>
+  <label>GAME</label>
+  <input id="fGame" placeholder="Free Fire"/>
+  <label>MÔ TẢ</label>
+  <textarea id="fDesc" rows="2" placeholder="ESP Box + Aimbot no root"></textarea>
+  <label>URL ẢNH PREVIEW</label>
+  <input id="fImage" placeholder="https://i.imgur.com/xxxxx.png"/>
+  <label>LINK DOWNLOAD</label>
+  <input id="fDownload" placeholder="https://drive.google.com/..."/>
+  <label>LOẠI</label>
+  <select id="fTag">
+    <option value="FREE">FREE</option>
+    <option value="VIP">VIP</option>
+  </select>
+  <div style="display:flex;gap:10px;margin-top:16px">
+    <button class="btn btn-green" onclick="submitForm()">✔ LƯU</button>
+    <button class="btn btn-blue" onclick="cancelEdit()">✕ HỦY</button>
+  </div>
+</div>
+
+<!-- DANH SÁCH -->
+<div class="topbar">
+  <span class="count" id="countLabel">0 tools</span>
+  <button class="btn btn-blue" onclick="exportJson()">📋 EXPORT JSON</button>
+  <button class="btn btn-red" onclick="clearAll()">🗑 XÓA TẤT CẢ</button>
+</div>
+
+<div id="list"></div>
+
+<!-- OUTPUT JSON -->
+<div class="json-out">
+  <h2>📄 DATA.JSON — COPY VÀ PASTE LÊN GITHUB</h2>
+  <textarea id="jsonBox" readonly></textarea>
+  <button class="btn btn-green copy-btn" onclick="copyJson()">📋 COPY JSON</button>
+</div>
+
+<script>
+let items = JSON.parse(localStorage.getItem('tuantu_items') || '[]');
+let nextId = items.length ? Math.max(...items.map(i=>i.id)) + 1 : 1;
+let editingId = null;
+
+function save() {
+  localStorage.setItem('tuantu_items', JSON.stringify(items));
+  render();
+  exportJson();
+}
+
+function render() {
+  document.getElementById('countLabel').textContent = items.length + ' tools';
+  document.getElementById('list').innerHTML = items.length === 0
+    ? '<p style="color:#333;letter-spacing:2px">Chưa có tool nào.</p>'
+    : items.map(item => `
+      <div class="card">
+        <h3>${item.title} &nbsp;<span class="tag-${item.tag.toLowerCase()}">[${item.tag}]</span></h3>
+        <p>${item.game} — ${item.description}</p>
+        <p style="color:#444;font-size:12px;margin-top:4px">${item.download}</p>
+        <div class="actions">
+          <button class="btn btn-blue" onclick="editItem(${item.id})">✏ SỬA</button>
+          <button class="btn btn-red" onclick="deleteItem(${item.id})">🗑 XÓA</button>
+        </div>
+      </div>
+    `).join('');
+}
+
+function submitForm() {
+  const title    = document.getElementById('fTitle').value.trim();
+  const game     = document.getElementById('fGame').value.trim();
+  const desc     = document.getElementById('fDesc').value.trim();
+  const image    = document.getElementById('fImage').value.trim();
+  const download = document.getElementById('fDownload').value.trim();
+  const tag      = document.getElementById('fTag').value;
+
+  if (!title || !download) {
+    alert('Điền ít nhất Tiêu đề và Link download!');
+    return;
+  }
+
+  if (editingId !== null) {
+    items = items.map(i => i.id === editingId
+      ? { id:i.id, title, game, description:desc, image, download, tag }
+      : i
+    );
+    editingId = null;
+    document.getElementById('formTitle').textContent = '+ THÊM TOOL MỚI';
+  } else {
+    items.push({ id: nextId++, title, game, description:desc, image, download, tag });
+  }
+
+  clearForm();
+  save();
+}
+
+function clearForm() {
+  ['fTitle','fGame','fDesc','fImage','fDownload'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fTag').value = 'FREE';
+}
+
+function editItem(id) {
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  editingId = id;
+  document.getElementById('fTitle').value    = item.title;
+  document.getElementById('fGame').value     = item.game;
+  document.getElementById('fDesc').value     = item.description;
+  document.getElementById('fImage').value    = item.image;
+  document.getElementById('fDownload').value = item.download;
+  document.getElementById('fTag').value      = item.tag;
+  document.getElementById('formTitle').textContent = '✏ SỬA TOOL #' + id;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function cancelEdit() {
+  editingId = null;
+  clearForm();
+  document.getElementById('formTitle').textContent = '+ THÊM TOOL MỚI';
+}
+
+function deleteItem(id) {
+  if (!confirm('Xóa tool này?')) return;
+  items = items.filter(i => i.id !== id);
+  save();
+}
+
+function clearAll() {
+  if (!confirm('Xóa TẤT CẢ?')) return;
+  items = [];
+  nextId = 1;
+  save();
+}
+
+function exportJson() {
+  document.getElementById('jsonBox').value = JSON.stringify(items, null, 2);
+}
+
+function copyJson() {
+  const box = document.getElementById('jsonBox');
+  box.select();
+  document.execCommand('copy');
+  alert('Đã copy! Giờ paste vào data.json trên GitHub.');
+}
+
+render();
+exportJson();
+</script>
+</body>
+</html>

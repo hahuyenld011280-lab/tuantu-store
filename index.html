@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TuanTu Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --red:    #ff1a1a;
+    --red2:   #cc0000;
+    --dark:   #0a0a0a;
+    --dark2:  #111111;
+    --dark3:  #1a0000;
+    --border: #330000;
+    --text:   #e0e0e0;
+    --glow:   0 0 12px rgba(255,26,26,0.7);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at top, #1a0000 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255,26,26,0.02) 40px, rgba(255,26,26,0.02) 41px),
+      repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,26,26,0.02) 40px, rgba(255,26,26,0.02) 41px);
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 40px 20px 20px;
+    position: relative;
+  }
+  header::after {
+    content: '';
+    display: block;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    margin-top: 20px;
+  }
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(28px, 6vw, 52px);
+    font-weight: 900;
+    color: var(--red);
+    text-shadow: var(--glow), 0 0 40px rgba(255,26,26,0.4);
+    letter-spacing: 4px;
+  }
+  .logo span { color: #fff; }
+  .subtitle {
+    font-size: 14px;
+    color: #666;
+    letter-spacing: 6px;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  /* FILTER BAR */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 20px;
+  }
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: #888;
+    padding: 6px 18px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover,
+  .filter-btn.active {
+    border-color: var(--red);
+    color: var(--red);
+    box-shadow: var(--glow);
+  }
+
+  /* SEARCH */
+  .search-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 0 20px 24px;
+  }
+  .search-wrap input {
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 20px;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 2px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-wrap input:focus { border-color: var(--red); }
+
+  /* GRID */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 0 20px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(255,26,26,0.25);
+    border-color: var(--red2);
+  }
+  .card-img-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    background: #0d0d0d;
+  }
+  .card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+  .card:hover .card-img-wrap img { transform: scale(1.05); }
+
+  .tag {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    border-radius: 2px;
+  }
+  .tag-FREE { background: #003300; color: #00ff88; border: 1px solid #00ff88; }
+  .tag-VIP  { background: #1a0000; color: var(--red); border: 1px solid var(--red); }
+
+  .card-body { padding: 16px; }
+  .card-game {
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 15px;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .btn-download {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, var(--red2), var(--red));
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    border-radius: 2px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-download::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.08);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+  .btn-download:hover::before { transform: scaleX(1); }
+  .btn-download:hover { box-shadow: var(--glow); }
+
+  /* COUNTER */
+  .counter {
+    text-align: center;
+    padding: 0 20px 16px;
+    color: #444;
+    font-size: 13px;
+    letter-spacing: 2px;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    color: #333;
+    font-size: 12px;
+    letter-spacing: 3px;
+  }
+
+  /* SKELETON loading */
+  .skeleton {
+    background: linear-gradient(90deg, #1a0000 25%, #220000 50%, #1a0000 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+    border-radius: 4px;
+  }
+  @keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">TUANTU <span>STORE</span></div>
+  <div class="subtitle">Hack Tools Distribution</div>
+</header>
+
+<div class="filter-bar" id="filterBar">
+  <button class="filter-btn active" data-filter="ALL">ALL</button>
+</div>
+
+<div class="search-wrap">
+  <input type="text" id="searchInput" placeholder="🔍  Tìm kiếm tool..."/>
+</div>
+
+<div class="counter" id="counter">Loading...</div>
+
+<div class="grid" id="grid"></div>
+
+<footer>© 2026 TUANTU STORE — ALL RIGHTS RESERVED</footer>
+
+<script>
+const DATA_URL = 'data.json';
+let allItems = [];
+let activeFilter = 'ALL';
+
+async function loadData() {
+  const grid = document.getElementById('grid');
+
+  // skeleton
+  grid.innerHTML = Array(6).fill(`
+    <div class="card">
+      <div class="skeleton" style="width:100%;aspect-ratio:16/9"></div>
+      <div class="card-body">
+        <div class="skeleton" style="height:12px;width:60%;margin-bottom:8px"></div>
+        <div class="skeleton" style="height:18px;width:80%;margin-bottom:8px"></div>
+        <div class="skeleton" style="height:12px;width:100%;margin-bottom:16px"></div>
+        <div class="skeleton" style="height:36px;width:100%"></div>
+      </div>
+    </div>
+  `).join('');
+
+  try {
+    const r = await fetch(DATA_URL + '?t=' + Date.now());
+    allItems = await r.json();
+    buildFilters();
+    render();
+  } catch(e) {
+    grid.innerHTML = '<p style="color:#ff1a1a;text-align:center;padding:40px">Lỗi load data.json</p>';
+  }
+}
+
+function buildFilters() {
+  const games = ['ALL', ...new Set(allItems.map(i => i.game))];
+  const bar = document.getElementById('filterBar');
+  bar.innerHTML = games.map(g =>
+    `<button class="filter-btn ${g==='ALL'?'active':''}" data-filter="${g}">${g}</button>`
+  ).join('');
+  bar.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      bar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      render();
+    });
+  });
+}
+
+function render() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allItems.filter(item => {
+    const matchFilter = activeFilter === 'ALL' || item.game === activeFilter;
+    const matchSearch = !q || item.title.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
+    return matchFilter && matchSearch;
+  });
+
+  document.getElementById('counter').textContent = `${filtered.length} TOOLS AVAILABLE`;
+
+  document.getElementById('grid').innerHTML = filtered.length === 0
+    ? '<p style="color:#444;text-align:center;padding:60px;grid-column:1/-1">Không tìm thấy tool nào.</p>'
+    : filtered.map(item => `
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="${item.image}" alt="${item.title}" loading="lazy"
+               onerror="this.src='https://via.placeholder.com/480x270/1a0000/ff1a1a?text=NO+IMAGE'"/>
+          <span class="tag tag-${item.tag}">${item.tag}</span>
+        </div>
+        <div class="card-body">
+          <div class="card-game">${item.game}</div>
+          <div class="card-title">${item.title}</div>
+          <div class="card-desc">${item.description}</div>
+          <a class="btn-download" href="${item.download}" target="_blank" rel="noopener">
+            ▼ DOWNLOAD
+          </a>
+        </div>
+      </div>
+    `).join('');
+}
+
+document.getElementById('searchInput').addEventListener('input', render);
+loadData();
+</script>
+</body>
+</html>
